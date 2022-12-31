@@ -1,8 +1,47 @@
 /**
- * タイルの画像を保持する配列
+ * タイルの画像要素の配列
  * @type {HTMLImageElement[]}
  */
 const TileImages = [];
+
+/**
+ * タイルの情報の配列
+ * @type {{name: string, desc: string}[]}
+ */
+const TileInformation = [
+	{
+		name: "床",
+		desc: "ボールが通行可能な床。"
+	},
+	{
+		name: "壁",
+		desc: "ボールが通行不可能な壁。"
+	},
+	{
+		name: "ゴール",
+		desc: "ボールがこれに触れるとゴールとなりステージクリア。"
+	},
+	{
+		name: "穴",
+		desc: "ボールの中心がここを通るとミスになる。"
+	},
+	{
+		name: "ベルトコンベア（上）",
+		desc: "ボールの中心がここを通るとボールが上に流れてしまう。"
+	},
+	{
+		name: "ベルトコンベア（右）",
+		desc: "ボールの中心がここを通るとボールが右に流れてしまう。"
+	},
+	{
+		name: "ベルトコンベア（下）",
+		desc: "ボールの中心がここを通るとボールが下に流れてしまう。"
+	},
+	{
+		name: "ベルトコンベア（左）",
+		desc: "ボールの中心がここを通るとボールが左に流れてしまう。"
+	}
+];
 
 /**
  * 現在選択中のタイル
@@ -43,6 +82,8 @@ window.addEventListener("load", () => {
 		CurrentTile = Math.min(Math.max(Math.floor((clickPosX - 1) / 20), 0), 7);
 		paletteContext.strokeStyle = "orange";
 		paletteContext.strokeRect(CurrentTile * 20 + 1, 1, 20, 20);
+		document.querySelector("#main_area > h3").innerText = TileInformation[CurrentTile].name;
+		document.querySelector("#main_area > p").innerText = TileInformation[CurrentTile].desc;
 	});
 });
 
