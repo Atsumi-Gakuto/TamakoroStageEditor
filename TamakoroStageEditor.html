@@ -3,9 +3,10 @@
 	<head>
 		<meta charset="utf-8">
 		<title>タマコロゲーム ステージエディター</title>
+		<script src="TamakoroStageEditor.js"></script>
 		<link rel="stylesheet" href="TamakoroStageEditor.css">
 	</head>
-	<body>
+	<body onload="init();">
 		<div id="control_buttons">
 			<button>読込</button>
 			<button>保存</button>
@@ -14,7 +15,7 @@
 		</div>
 		<div id="main_area">
 			<canvas id="stage_canvas" width="380" height="500"></canvas>
-			<canvas id="palette_canvas" width="380" height="20px"></canvas>
+			<canvas id="palette_canvas" width="162" height="22px"></canvas>
 		</div>
 	</body>
 </html>
