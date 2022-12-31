@@ -1,0 +1,9 @@
+#main_area {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+canvas {
+	margin-top: 30px;
+	border: solid 2px lightgray;
+}
