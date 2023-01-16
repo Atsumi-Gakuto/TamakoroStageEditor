@@ -56,6 +56,12 @@ const TileInformation = [
 const StageData = Array.from({length: 25}, () => Array(19).fill(0));
 
 /**
+ * ボールの初期位置
+ * @type {number[2]}
+ */
+let BallPos = [0, 0];
+
+/**
  * 現在選択中のタイル
  * @type {number}
  */
@@ -115,7 +121,6 @@ window.addEventListener("load", () => {
 		}
 	}
 
-
 	stageCanvas.addEventListener("click", (event) => clickTile(event));
 	stageCanvas.addEventListener("mousemove", (event) => {
 		if(IsMouseDown) clickTile(event);
@@ -132,10 +137,24 @@ window.addEventListener("load", () => {
 		document.querySelector("#main_area > h3").innerText = TileInformation[CurrentTile].name;
 		document.querySelector("#main_area > p").innerText = TileInformation[CurrentTile].desc;
 	});
+
+	//ステージ内で右クリックした時のイベント
+	stageCanvas.addEventListener("contextmenu", (event) => {
+		event.preventDefault();
+		const boundingRect = event.target.getBoundingClientRect();
+		BallPos = [Math.floor((event.clientX - boundingRect.left) / 20), Math.floor((event.clientY - boundingRect.top) / 20)];
+		const ballElement = document.getElementById("ball");
+		ballElement.style.marginLeft = `${BallPos[0] * 20}px`;
+		ballElement.style.marginTop = `${BallPos[1] * 20}px`;
+	});
 }, {once: true});
 
-window.addEventListener("mousedown", () => IsMouseDown = true);
-window.addEventListener("mouseup", () => IsMouseDown = false);
+window.addEventListener("mousedown", (event) => {
+	if(event.button == 0) IsMouseDown = true;
+});
+window.addEventListener("mouseup", (event) => {
+	if(event.button == 0) IsMouseDown = false;
+});
 
 //タイル画像の読み込み
 for(let i = 0; i < 8; i++) {

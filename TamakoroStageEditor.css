@@ -10,9 +10,22 @@
 	max-width: 380px;
 	margin-bottom: 0;
 }
-#stage_canvas {
+#stage_canvas_area {
+	position: relative;
+	width: 380px;
+	height: 500px;
 	margin-top: 50px;
 	border: solid 2px lightgray;
+}
+#stage_canvas_area > * {
+	position: absolute;
+}
+#ball {
+	width: 20px;
+	height: 20px;
+	background-color: red;
+	border-radius: 10px;
+	pointer-events: none;
 }
 #palette_canvas {
 	margin-top: 30px;
