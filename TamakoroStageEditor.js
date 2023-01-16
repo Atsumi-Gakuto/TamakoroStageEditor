@@ -1,4 +1,10 @@
 /**
+ * 	ステージのキャンバスのコンテキスト
+ * @type {CanvasRenderingContext2D|undefined}
+ */
+let StageCanvasContext = undefined;
+
+/**
  * タイルの画像要素の配列
  * @type {HTMLImageElement[]}
  */
@@ -65,9 +71,8 @@ let IsMouseDown = false;
  * ステージ全体を描画する
  */
 function drawStage() {
-	const stageCanvasContext = document.getElementById("stage_canvas").getContext("2d");
 	for(let y = 0; y < 25; y++) {
-		for(let x = 0; x < 19; x++) stageCanvasContext.drawImage(TileImages[StageData[y][x]], x * 20, y * 20);
+		for(let x = 0; x < 19; x++) StageCanvasContext.drawImage(TileImages[StageData[y][x]], x * 20, y * 20);
 	}
 }
 
@@ -75,6 +80,7 @@ function drawStage() {
 window.addEventListener("load", () => {
 	//ステージの描画
 	const stageCanvas = document.getElementById("stage_canvas");
+	StageCanvasContext = document.getElementById("stage_canvas").getContext("2d");
 
 	//パレットの描画
 	const paletteCanvas = document.getElementById("palette_canvas");
@@ -102,7 +108,7 @@ window.addEventListener("load", () => {
 			const mousePos = [Math.floor((event.clientX - boundingRect.left) / 20), Math.floor((event.clientY - boundingRect.top) / 20)];
 			if(StageData[mousePos[1]][mousePos[0]] != CurrentTile) {
 				StageData[mousePos[1]][mousePos[0]] = CurrentTile;
-				stageCanvasContext.drawImage(TileImages[CurrentTile], mousePos[0] * 20, mousePos[1] * 20);
+				StageCanvasContext.drawImage(TileImages[CurrentTile], mousePos[0] * 20, mousePos[1] * 20);
 			}
 		}
 	});
