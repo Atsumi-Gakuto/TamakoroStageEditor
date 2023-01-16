@@ -102,15 +102,23 @@ window.addEventListener("load", () => {
 	}
 
 	//ステージ内でカーソルが動いた時のイベント
-	stageCanvas.addEventListener("mousemove", (event) => {
-		if(IsMouseDown) {
-			const boundingRect = event.target.getBoundingClientRect();
-			const mousePos = [Math.floor((event.clientX - boundingRect.left) / 20), Math.floor((event.clientY - boundingRect.top) / 20)];
-			if(StageData[mousePos[1]][mousePos[0]] != CurrentTile) {
-				StageData[mousePos[1]][mousePos[0]] = CurrentTile;
-				StageCanvasContext.drawImage(TileImages[CurrentTile], mousePos[0] * 20, mousePos[1] * 20);
-			}
+	/**
+	 * タイルを塗り替える処理
+	 * @param {MouseEvent} event
+	 */
+	function clickTile(event) {
+		const boundingRect = event.target.getBoundingClientRect();
+		const mousePos = [Math.floor((event.clientX - boundingRect.left) / 20), Math.floor((event.clientY - boundingRect.top) / 20)];
+		if(StageData[mousePos[1]][mousePos[0]] != CurrentTile) {
+			StageData[mousePos[1]][mousePos[0]] = CurrentTile;
+			StageCanvasContext.drawImage(TileImages[CurrentTile], mousePos[0] * 20, mousePos[1] * 20);
 		}
+	}
+
+
+	stageCanvas.addEventListener("click", (event) => clickTile(event));
+	stageCanvas.addEventListener("mousemove", (event) => {
+		if(IsMouseDown) clickTile(event);
 	});
 
 	//パレットをクリックした時のイベント
