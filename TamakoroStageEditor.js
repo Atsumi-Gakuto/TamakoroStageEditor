@@ -44,48 +44,84 @@ const TileInformation = [
 ];
 
 /**
+ * ステージを表現する配列
+ * @type {number[][]}
+ */
+const StageData = Array.from({length: 25}, () => Array(19).fill(0));
+
+/**
  * 現在選択中のタイル
  * @type {number}
  */
 let CurrentTile = 0;
 
+/**
+ * マウスボタンが押されているかどうか
+ * @type {boolean}
+ */
+let IsMouseDown = false;
+
+/**
+ * ステージ全体を描画する
+ */
+function drawStage() {
+	const stageCanvasContext = document.getElementById("stage_canvas").getContext("2d");
+	for(let y = 0; y < 25; y++) {
+		for(let x = 0; x < 19; x++) stageCanvasContext.drawImage(TileImages[StageData[y][x]], x * 20, y * 20);
+	}
+}
+
 //初期処理
 window.addEventListener("load", () => {
 	//ステージの描画
-	const stageCanvasContext = document.getElementById("stage_canvas").getContext("2d");
-	for(let y = 0; y < 25; y++) {
-		for(let x = 0; x < 19; x++) stageCanvasContext.drawImage(TileImages[0], x * 20, y * 20);
-	}
+	const stageCanvas = document.getElementById("stage_canvas");
+
 	//パレットの描画
-	const paletteContext = document.getElementById("palette_canvas").getContext("2d");
-	paletteContext.strokeStyle = "lightgray";
-	paletteContext.lineWidth = 1;
-	paletteContext.strokeRect(0, 0, 162, 22);
+	const paletteCanvas = document.getElementById("palette_canvas");
+	const paletteCanvasContext = paletteCanvas.getContext("2d");
+	paletteCanvasContext.strokeStyle = "lightgray";
+	paletteCanvasContext.lineWidth = 1;
+	paletteCanvasContext.strokeRect(0, 0, 162, 22);
 	for(let i = 0; i < 8; i++) {
-		paletteContext.drawImage(TileImages[i], i * 20 + 1, 1);
+		paletteCanvasContext.drawImage(TileImages[i], i * 20 + 1, 1);
 		switch(i) {
 			case 0:
-				paletteContext.strokeStyle = "orange";
+				paletteCanvasContext.strokeStyle = "orange";
 				break;
 			case 1:
-				paletteContext.strokeStyle = "lightgray";
+				paletteCanvasContext.strokeStyle = "lightgray";
 				break;
 		}
-		paletteContext.strokeRect(i * 20 + 1, 1, 20, 20);
+		paletteCanvasContext.strokeRect(i * 20 + 1, 1, 20, 20);
 	}
 
+	//ステージ内でカーソルが動いた時のイベント
+	stageCanvas.addEventListener("mousemove", (event) => {
+		if(IsMouseDown) {
+			const boundingRect = event.target.getBoundingClientRect();
+			const mousePos = [Math.floor((event.clientX - boundingRect.left) / 20), Math.floor((event.clientY - boundingRect.top) / 20)];
+			if(StageData[mousePos[1]][mousePos[0]] != CurrentTile) {
+				StageData[mousePos[1]][mousePos[0]] = CurrentTile;
+				stageCanvasContext.drawImage(TileImages[CurrentTile], mousePos[0] * 20, mousePos[1] * 20);
+			}
+		}
+	});
+
 	//パレットをクリックした時のイベント
-	document.getElementById("palette_canvas").addEventListener("click", (event) => {
+	paletteCanvas.addEventListener("click", (event) => {
 		const clickPosX = event.clientX - event.target.getBoundingClientRect().left;
-		paletteContext.strokeStyle = "lightgray";
-		paletteContext.strokeRect(CurrentTile * 20 + 1, 1, 20, 20);
+		paletteCanvasContext.strokeStyle = "lightgray";
+		paletteCanvasContext.strokeRect(CurrentTile * 20 + 1, 1, 20, 20);
 		CurrentTile = Math.min(Math.max(Math.floor((clickPosX - 1) / 20), 0), 7);
-		paletteContext.strokeStyle = "orange";
-		paletteContext.strokeRect(CurrentTile * 20 + 1, 1, 20, 20);
+		paletteCanvasContext.strokeStyle = "orange";
+		paletteCanvasContext.strokeRect(CurrentTile * 20 + 1, 1, 20, 20);
 		document.querySelector("#main_area > h3").innerText = TileInformation[CurrentTile].name;
 		document.querySelector("#main_area > p").innerText = TileInformation[CurrentTile].desc;
 	});
-});
+}, {once: true});
+
+window.addEventListener("mousedown", () => IsMouseDown = true);
+window.addEventListener("mouseup", () => IsMouseDown = false);
 
 //タイル画像の読み込み
 for(let i = 0; i < 8; i++) {
