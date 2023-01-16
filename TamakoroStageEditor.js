@@ -147,6 +147,15 @@ window.addEventListener("load", () => {
 		ballElement.style.marginLeft = `${BallPos[0] * 20}px`;
 		ballElement.style.marginTop = `${BallPos[1] * 20}px`;
 	});
+
+	//保存ボタン
+	document.getElementById("save_button").addEventListener("click", () => {
+		const blob = new Blob([JSON.stringify({stage: StageData, startPos: BallPos})], {type: "application/json"});
+		const downloadLink = document.createElement("a");
+		downloadLink.href = URL.createObjectURL(blob);
+		downloadLink.download = "stage.json";
+		downloadLink.click()
+	});
 }, {once: true});
 
 window.addEventListener("mousedown", (event) => {
