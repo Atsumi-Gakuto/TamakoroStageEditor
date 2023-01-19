@@ -53,7 +53,7 @@ const TileInformation = [
  * ステージを表現する配列
  * @type {number[][]}
  */
-const StageData = Array.from({length: 25}, () => Array(19).fill(0));
+let StageData = Array.from({length: 25}, () => Array(19).fill(0));
 
 /**
  * ボールの初期位置
@@ -74,12 +74,15 @@ let CurrentTile = 0;
 let IsMouseDown = false;
 
 /**
- * ステージ全体を描画する
+ * ボールの位置を設定する。
+ * @param {number} x ボールのx座標
+ * @param {number} y ボールのy座標
  */
-function drawStage() {
-	for(let y = 0; y < 25; y++) {
-		for(let x = 0; x < 19; x++) StageCanvasContext.drawImage(TileImages[StageData[y][x]], x * 20, y * 20);
-	}
+function setBallPos(x, y) {
+	BallPos = [x, y];
+	const ballElement = document.getElementById("ball");
+	ballElement.style.marginLeft = `${BallPos[0] * 20}px`;
+	ballElement.style.marginTop = `${BallPos[1] * 20}px`;
 }
 
 //初期処理
@@ -142,10 +145,56 @@ window.addEventListener("load", () => {
 	stageCanvas.addEventListener("contextmenu", (event) => {
 		event.preventDefault();
 		const boundingRect = event.target.getBoundingClientRect();
-		BallPos = [Math.floor((event.clientX - boundingRect.left) / 20), Math.floor((event.clientY - boundingRect.top) / 20)];
-		const ballElement = document.getElementById("ball");
-		ballElement.style.marginLeft = `${BallPos[0] * 20}px`;
-		ballElement.style.marginTop = `${BallPos[1] * 20}px`;
+		setBallPos(Math.floor((event.clientX - boundingRect.left) / 20), Math.floor((event.clientY - boundingRect.top) / 20));
+	});
+
+	//読み込みボタン
+	document.getElementById("load_button").addEventListener("click", () => {
+		const fileInput = document.createElement("input");
+		fileInput.type = "file";
+		fileInput.accept = "application/json";
+		fileInput.addEventListener("change", (event) => {
+			if(event.target.files.length >= 1) {
+				const reader = new FileReader();
+				reader.addEventListener("load", () => {
+					let stageData = undefined;
+					try {
+						stageData = JSON.parse(reader.result);
+					}
+					catch(error) {
+						alert("エラー：入力されたjsonファイルには文法上の誤りがあります。");
+						return;
+					}
+					if(stageData) {
+						StageData = Array.from({length: 25}, () => Array(19).fill(0));
+						StageCanvasContext.clearRect(0, 0, 380, 500);
+						if(stageData.stage instanceof Array) {
+							for(let y = 0; y < stageData.stage.length; y++) {
+								if(y <= 24) {
+									if(stageData.stage[y] instanceof Array) {
+										for(let x = 0; x < stageData.stage[y].length; x++) {
+											if(x <= 18) {
+												if(Number.isInteger(stageData.stage[y][x]) && stageData.stage[y][x] >= 0 && stageData.stage[y][x] <= 7) StageData[y][x] = stageData.stage[y][x];
+											}
+											else break;
+										}
+									}
+								}
+								else break;
+							}
+							StageData.forEach((y, yIndex) => {
+								y.forEach((x, xIndex) => {
+									StageCanvasContext.drawImage(TileImages[x], xIndex * 20, yIndex * 20);
+								});
+							});
+						}
+						if(stageData.startPos instanceof Array) setBallPos(typeof(stageData.startPos[0]) == "number" ? Math.min(Math.max(Math.ceil(stageData.startPos[0]), 0), 18) : 0, typeof(stageData.startPos[1]) == "number" ? Math.min(Math.max(Math.ceil(stageData.startPos[1]), 0), 24) : 0);
+					}
+				}, {once: true});
+				reader.readAsText(event.target.files[0]);
+			}
+		}, {once: true});
+		fileInput.click();
 	});
 
 	//保存ボタン
@@ -154,7 +203,7 @@ window.addEventListener("load", () => {
 		const downloadLink = document.createElement("a");
 		downloadLink.href = URL.createObjectURL(blob);
 		downloadLink.download = "stage.json";
-		downloadLink.click()
+		downloadLink.click();
 	});
 }, {once: true});
 
